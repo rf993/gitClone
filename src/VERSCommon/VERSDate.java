@@ -70,6 +70,12 @@ public class VERSDate {
         int year, month, day, hour, min;
         char tz;
 
+        // sanity...
+        if (value == null) {
+            dateFailed("", 0, 0, "Date is empty");
+            return;
+        }
+        
         // check year
         if (value.length() < 4) {
             dateFailed(value, 0, 4, "Year must match 'yyyy'");
