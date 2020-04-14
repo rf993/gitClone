@@ -7,9 +7,8 @@
 package VERSCommon;
 
 /**
- * This class represents a fatal error that occurred when constructing a VEO.
- * A fatal error is one that means it is not possible to continue to process any
- * VEOs. It is generally a system error.
+ * This class represents a fatal error. It is not expected that any further
+ * processing can be attempted and the program should exit.
  */
 public class AppFatal extends Exception {
     private final int errno;  // error number for automated processing

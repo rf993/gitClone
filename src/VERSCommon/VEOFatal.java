@@ -9,7 +9,7 @@ package VERSCommon;
 /**
  * This class represents a fatal error that occurred when constructing a VEO.
  * A fatal error is one that means it is not possible to continue to process any
- * VEOs.
+ * VEOs. 
  */
 public class VEOFatal extends VEOError {
 

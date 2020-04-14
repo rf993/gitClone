@@ -7,8 +7,8 @@
 package VERSCommon;
 
 /**
- * This class represents a non fatal error produced when constructing a VEO.
- * This VEO should be aborted and cleaned up, but further VEOs may be attempted.
+ * This class represents a non fatal error. The processing for this object
+ * should be cleaned up, but further processing can be attempted.
  */
 public class AppError extends Exception {
     private final int errno;  // error number for automated processing

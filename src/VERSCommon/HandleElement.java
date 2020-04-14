@@ -9,10 +9,21 @@ package VERSCommon;
 import java.nio.file.Path;
 
 /**
- * Public class for XML consumer to tell the parser what needs to be done with
- * the element, particularly the value of the element. There are two activities
- * The first, copyOfXML instructs that the contents of the element (i.e. element
- * name and value) are to be captured as XML
+ * Instructions from {@link XMLConsumer} to tell an {@link XMLParser} what needs
+ * is to be done with the contents of the element. The consumer has three
+ * options:
+ * <ul>
+ * <li>Capture the element value as a string. There is a suboption to indicate
+ * that this value is Base64 encoded and to decode it while writing to the file.
+ * <li>Capture the element value directly into a file. This is useful is the
+ * value is a lengthy value. XML quoted text is as XML quoted text (e.g.
+ * &amp;gt; is output as &amp;gt;). There is a suboption to indicate that this
+ * value is Base64 encoded and to decode it while writing to the file.
+ * <li>Capture the entire element (including the start and end tags, and
+ * subelements) as String. In this case XML special characters in the value
+ * content are captured in their quoted form (e.g. &amp; is output as &amp;gt;)
+ * so that the element is still valid XML.
+ * </ul>
  */
 public class HandleElement {       
     static final public int ELEMENT_TO_STRING = 0; // capture entire element as a string

@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * This class contains utility objects generally used in VEOCreate and
- * VEOAnalysis.
+ * This class contains utility routines to handle VERS Date/Times. These are
+ * a restricted set of ISO 8601 time values.
  */
 public class VERSDate {
 

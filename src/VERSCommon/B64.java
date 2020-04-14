@@ -6,14 +6,29 @@
  */
 package VERSCommon;
 
-/**
- * This class encapsulates routines to encode and decode from Base64 Base64 is
- * defined in RFC 2045 Multipurpose Internet Mail Extensions (MIME) Part One:
- * Format of Internet Message Bodies, section 6.8.
- */
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * This class encapsulates routines to encode and decode from Base64. Base64 is
+ * defined in RFC 2045 Multipurpose Internet Mail Extensions (MIME) Part One:
+ * Format of Internet Message Bodies, section 6.8. This class was written a long
+ * time ago, before widely available public domain versions. It's still used
+ * because it would require significant rewriting of the calling code to change.
+ */
 public class B64 {
 
     private static final char[] CHAR_MAP_ENC = {
@@ -37,11 +52,11 @@ public class B64 {
      *
      * @param	in	the InputStream containing the data
      * @param bw the Writer that gets the Base64
-     * @throws	IOException
+     * @throws	IOException if either the InputStream or Writer failed
      */
     public void toBase64(InputStream in, Writer bw)
             throws IOException {
-        int i, j, c;
+        int i, c;
         byte[] bin, bout;
         BufferedInputStream bis;
 
@@ -174,7 +189,7 @@ public class B64 {
      *
      * @param	in	the StringBuilder containing the encoded data
      * @param	out	the OutputStream for the plaintext data
-     * @throws	IOException
+     * @throws	IOException if the OutputStream failed
      */
     public void fromBase64(StringBuilder in, OutputStream out) throws IOException {
         int i, j, pad, c;
@@ -222,7 +237,7 @@ public class B64 {
      *
      * @param	in	the InputStream containing the encoded data
      * @param	out	the OutputStream for the plaintext data
-     * @throws	IOException
+     * @throws	IOException if either the Reader or OutputStream failed
      */
     public void fromBase64(Reader in, OutputStream out) throws IOException {
         int i, pad, c;
@@ -269,7 +284,7 @@ public class B64 {
      *
      * @param	in	the byte array containing the encoded data
      * @return converted byte array
-     * @throws	IOException
+     * @throws	IOException if the conversion failed
      */
     public byte[] fromBase64(byte[] in) throws IOException {
         int i, j, pad;
@@ -310,25 +325,6 @@ public class B64 {
         }
         baos.close();
         return baos.toByteArray();
-    }
-
-    /**
-     * Decode the data in a character array from Base64 and write it to an
-     * output Stream
-     *
-     * @param	in	the character array containing the encoded data
-     * @param	start	start position in array
-     * @param	length	length of valid characters
-     * @param	out	the output stream
-     * @throws	IOException
-     */
-    int si;				// current index into sbin
-    byte[] sbin = {0, 0, 0, 0};	// static array for decoding. Needed because
-    // arrays passed into this method may not end
-    // on 3 byte boundaries
-
-    public void reset() {
-        si = 0;
     }
 
     /*
@@ -373,6 +369,29 @@ public class B64 {
         }
     }
 */
+    
+    private int si;                     // current index into sbin
+    private byte[] sbin = {0, 0, 0, 0};	// static array for decoding. Needed because
+    // arrays passed into this method may not end
+    // on 3 byte boundaries
+
+    /**
+     * Reset the decoder
+     */
+    public void reset() {
+        si = 0;
+    }
+    
+    /**
+     * Decode the data in a character array from Base64 and write it to an
+     * output Stream
+     *
+     * @param	in	the character array containing the encoded data
+     * @param	start	start position in array
+     * @param	length	length of valid characters
+     * @param	out	the output stream
+     * @throws	IOException if the OutputStream failed
+     */
 
     public void fromBase64(char[] in, int start, int length, OutputStream out)
             throws IOException {
@@ -413,9 +432,18 @@ public class B64 {
             }
         }
     }
+    
+    /**
+     * Decode the data in a character array from Base64 and write it to a
+     * StringBuilder
+     *
+     * @param	in	the character array containing the encoded data
+     * @param	start	start position in array
+     * @param	length	length of valid characters
+     * @param	out	the output StringBuilder
+     */
 
-    public void fromBase64(char[] in, int start, int length, StringBuilder out)
-            throws IOException {
+    public void fromBase64(char[] in, int start, int length, StringBuilder out) {
         int j, pad;
         byte b;
         byte[] bout;
@@ -454,9 +482,14 @@ public class B64 {
         }
     }
 
+    /**
+     * Test program.
+     * 
+     * @param args command line arguments
+     */
     public static void main(String args[]) {
         B64 b64;
-        File fin, fin1, fin2, fout;
+        File fin, fout;
         FileInputStream fis, fis1, fis2;
         FileOutputStream fos;
         OutputStreamWriter osw;
@@ -466,7 +499,7 @@ public class B64 {
         byte[] b1, b2, b3;
         ByteArrayOutputStream baos;
 
-        System.err.println("Usage: B64 [-e] [-d] [<file>]");
+        System.err.println("Usage: B64 [<file>]");
         b64 = new B64();
 
         try {

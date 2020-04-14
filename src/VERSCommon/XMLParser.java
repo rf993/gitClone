@@ -6,38 +6,6 @@
  */
 package VERSCommon;
 
-/**
- * Parse
- *
- * This class parses an XML file using SAX. It provides a wrapper around SAX to
- * provide a simple interface designed to efficiently parse XML documents that
- * are typical of data messages where an element either contains a set of
- * subelements, or textual content, but not both. It deals with element content
- * that is Base64 encoded.
- *
- * The parser will NOT validate the XML file against a DTD (i.e. it ignores the
- * DOCTYPE declaration).
- *
- * The parser extends a SAX handler. Handlers are called whenever start element,
- * end element, characters, or comments are encountered.
- *
- * When a start element is encountered, the class builds a representation of the
- * path of elements from the root of the document. It then passes this path and
- * any attributes back to the caller for handling. The caller then instructs the
- * parser what to do with the element. Three options are available: 1. Capture
- * the element and its contents into a String (note that this is not recursive;
- * if an element is being captured, you cannot also capture a subelement. But
- * you can capture the value of a subelement. 2. Capture the value of a leaf
- * element into a String. Note that you cannot capture the value of a non-leaf
- * element. 3. Capture the value of a leaf element into a File. Note that you
- * cannot capture the value of a non-leaf element
- *
- * When an end element is encountered, the class passes the path of the
- * finalised element back to the caller, together with the value of the element.
- *
- * 20180314 Any DOCTYPE in the XML file will now be ignored (i.e. can't validate
- * against a DTD) 20180101 Based on TRIMExport
- */
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -56,6 +24,35 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.*;
 import org.xml.sax.ext.DefaultHandler2;
 
+/**
+ * This class parses an XML file using SAX. It provides a wrapper around SAX to
+ * provide a simple interface designed to efficiently parse XML documents that
+ * are typical of data messages where an element either contains a set of
+ * subelements, or textual content, but not both. It deals with element content
+ * that is Base64 encoded, and it can directly output content to files.
+ * <p>
+ * The class works with an {@link XMLConsumer}. This class does the parsing of
+ * the XML file, the XMLConsumer implements the application logic deciding what
+ * to do with the parsed information.
+ * <p>
+ * When a start element is encountered, the class builds a representation of the
+ * path of elements from the root of the document. It then passes this path and
+ * any attributes back to the {@link XMLConsumer} for handling. The
+ * {@link XMLConsumer} then instructs the parser what to do with the content of
+ * the element. Three options are available: 1. Capture the element and its
+ * contents into a String (note that this is not recursive; if an element is
+ * being captured, you cannot also capture a subelement. But you can capture the
+ * value of a subelement. 2. Capture the value of a leaf element into a String.
+ * Note that you cannot capture the value of a non-leaf element. 3. Capture the
+ * value of a leaf element into a File. Note that you cannot capture the value
+ * of a non-leaf element
+ * <p>
+ * When an end element is encountered, the class passes the path of the
+ * finalised element back to the caller, together with the value of the element.
+ * <p>
+ * The parser will NOT validate the XML file against a DTD (i.e. it ignores the
+ * DOCTYPE declaration).
+ */
 public class XMLParser extends DefaultHandler2 {
 
     private final SAXParser sax;          // XML parser to perform parse
@@ -78,9 +75,11 @@ public class XMLParser extends DefaultHandler2 {
 
     /**
      * Set up a parser to deal with documents. This parser can be used to
-     * repeatedly parse individual documents.
+     * repeatedly parse individual documents. The argument passed in is an
+     * {@link XMLConsumer} that will receive callbacks when start and end tags
+     * are encountered in the file.
      *
-     * @param consumer callback to consumer start and end elements
+     * @param consumer callback to consume start and end elements
      * @throws AppFatal if a fatal error occurred
      */
     public XMLParser(XMLConsumer consumer) throws AppFatal {
@@ -108,13 +107,22 @@ public class XMLParser extends DefaultHandler2 {
         recordElement = false;
         elementBeingCopied = null;
         elementCopy = null;
+        he = null;
+        elementValue = null;
     }
 
     /**
-     * XMLParser the XML
-     *
-     * This method opens an XML file and calls SAX to parse it looking for
-     * information
+     * Parse an XML file. This method opens an XML file and calls SAX to parse
+     * it. As start and end tags are encountered, the {@link XMLConsumer} is
+     * called to process them.
+     * <p>
+     * When a start tag is encountered, the {@link XMLConsumer} is given the
+     * pathname of the tag, and the attributes. The {@link XMLConsumer} returns
+     * instructions about what to do with the XML value.
+     * <p>
+     * When an end tag is encountered, the {@link XMLConsumer} is given the
+     * pathname of the tag, and the value of the element (if requested when the
+     * corresponding start tag was encountered)
      *
      * @param xmlFile the file to parse
      * @throws AppError in the event of a VEO error
@@ -195,17 +203,17 @@ public class XMLParser extends DefaultHandler2 {
     }
 
     /**
-     * Start of element
+     * This method is called when the SAX parser finds a new element. The
+     * element name is pushed onto the stack. The stack keeps the element path
+     * from the root of the parse tree to the current element.
+     * <p>
+     * This method should not be called by an {@link XMLConsumer}.
      *
-     * This event is called when the SAX parser finds a new element. The element
-     * name is pushed onto the stack. The stack keeps the element path from the
-     * root of the parse tree to the current element.
-     *
-     * @param uri
-     * @param localName
-     * @param qName
-     * @param attributes
-     * @throws SAXException
+     * @param uri see Sax DefaultHandler2
+     * @param localName see Sax DefaultHandler2
+     * @param qName see Sax DefaultHandler2
+     * @param attributes see Sax DefaultHandler2
+     * @throws SAXException see Sax DefaultHandler2
      */
     @Override
     public void startElement(String uri, String localName,
@@ -290,21 +298,21 @@ public class XMLParser extends DefaultHandler2 {
     }
 
     /**
-     * Processing the content of an element
+     * Processing the content of an element.
+     * <p>
+     * This method should not be called by an {@link XMLConsumer}.
      *
-     * Remember the element content if we are interested in the element
-     *
-     * @param ch
-     * @param start
-     * @param length
-     * @throws org.xml.sax.SAXException
+     * @param ch see Sax DefaultHandler2
+     * @param start see Sax DefaultHandler2
+     * @param length see Sax DefaultHandler2
+     * @throws org.xml.sax.SAXException see Sax DefaultHandler2
      */
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
         int i;
 
-        // record the characters if capturing an element. But DON'T capture
+        // record the characters if capturing a full element. But DON'T capture
         // the characters if the value is being captured to a file
         if (recordElement && !(he != null && he.actionRequested() == HandleElement.VALUE_TO_FILE)) {
             for (i = start; i < start + length; i++) {
@@ -335,11 +343,7 @@ public class XMLParser extends DefaultHandler2 {
         // store the value (decoding Base64 if necessary)
         if (he != null && he.actionRequested() == HandleElement.VALUE_TO_STRING) {
             if (he.isDecodeBase64()) {
-                try {
-                    b64.fromBase64(ch, start, length, elementValue);
-                } catch (IOException ioe) {
-                    throw new SAXException("XMLParser.characters(): failed decoding Base64 to String because: " + ioe.getMessage());
-                }
+                b64.fromBase64(ch, start, length, elementValue);
             } else {
                 elementValue.append(ch, start, length);
             }
@@ -365,15 +369,17 @@ public class XMLParser extends DefaultHandler2 {
     }
 
     /**
-     * Processing the content of a comment
+     * Processing the content of a comment.
      *
      * Assume comment is in the content of a value. Only record this if we are
-     * recording an element
+     * recording an element.
+     * <p>
+     * This method should not be called by an {@link XMLConsumer}.
      *
-     * @param ch
-     * @param start
-     * @param length
-     * @throws org.xml.sax.SAXException
+     * @param ch see Sax DefaultHandler2
+     * @param start see Sax DefaultHandler2
+     * @param length see Sax DefaultHandler2
+     * @throws org.xml.sax.SAXException see Sax DefaultHandler2
      */
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
@@ -385,17 +391,16 @@ public class XMLParser extends DefaultHandler2 {
     }
 
     /**
-     * End of an element
+     * End of an element. If recording an element (and this is matching end
+     * tag), stop recording the element. Return the value and the element
+     * recorded (one or both may be null).
+     * <p>
+     * This method should not be called by an {@link XMLConsumer}.
      *
-     * Found the end of an element. If recording a value, recording. If
-     * recording an element (and this is matching end tag), stop recording the
-     * element. Return the value and the element recorded (one or both may be
-     * null).
-     *
-     * @param uri
-     * @param localName
-     * @param qName
-     * @throws org.xml.sax.SAXException
+     * @param uri see Sax DefaultHandler2
+     * @param localName see Sax DefaultHandler2
+     * @param qName see Sax DefaultHandler2
+     * @throws org.xml.sax.SAXException see Sax DefaultHandler2
      */
     @Override
     public void endElement(String uri, String localName, String qName)
@@ -501,9 +506,7 @@ public class XMLParser extends DefaultHandler2 {
     }
 
     /**
-     * XML encode string
-     *
-     * Make sure any XML special characters in a string are encoded
+     * Encode any XML special characters in a string.
      *
      * @param in the String to encode
      * @return the encoded string
