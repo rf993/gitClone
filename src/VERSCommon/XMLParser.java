@@ -343,7 +343,8 @@ public class XMLParser extends DefaultHandler2 {
         // store the value (decoding Base64 if necessary)
         if (he != null && he.actionRequested() == HandleElement.VALUE_TO_STRING) {
             if (he.isDecodeBase64()) {
-                b64.fromBase64(ch, start, length, elementValue);
+                throw new SAXException("XMLParser.characters(): failed decoding Base64 to String is not supported");
+                // b64.fromBase64(ch, start, length, elementValue);
             } else {
                 elementValue.append(ch, start, length);
             }

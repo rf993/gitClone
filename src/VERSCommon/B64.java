@@ -443,6 +443,7 @@ public class B64 {
      * @param	out	the output StringBuilder
      */
 
+    /*
     public void fromBase64(char[] in, int start, int length, StringBuilder out) {
         int j, pad;
         byte b;
@@ -481,6 +482,7 @@ public class B64 {
             }
         }
     }
+    */
 
     /**
      * Test program.
