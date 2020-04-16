@@ -13,8 +13,7 @@ import java.nio.file.Path;
  * is to be done with the contents of the element. The consumer has three
  * options:
  * <ul>
- * <li>Capture the element value as a string. There is a suboption to indicate
- * that this value is Base64 encoded and to decode it while writing to the file.
+ * <li>Capture the element value as a string.
  * <li>Capture the element value directly into a file. This is useful is the
  * value is a lengthy value. XML quoted text is as XML quoted text (e.g.
  * &amp;gt; is output as &amp;gt;). There is a suboption to indicate that this
@@ -25,7 +24,8 @@ import java.nio.file.Path;
  * so that the element is still valid XML.
  * </ul>
  */
-public class HandleElement {       
+public class HandleElement {
+
     static final public int ELEMENT_TO_STRING = 0; // capture entire element as a string
     static final public int VALUE_TO_STRING = 1;   // capture value as a string
     static final public int VALUE_TO_FILE = 2;     // capture value in a file
@@ -34,8 +34,8 @@ public class HandleElement {
     private final Path outputFile;      // if isReturnValue is false, the file to create to hold the value
 
     /**
-     * Simple instruction - capture an ordinary value or element as a string
-     * 
+     * Capture an ordinary value or element as a string
+     *
      * @param action What to capture
      */
     public HandleElement(int action) {
@@ -43,19 +43,24 @@ public class HandleElement {
         decodeBase64 = false;
         outputFile = null;
     }
-    
+
     /**
-     * Simple instruction - capture an Base64 encoded value (to a file or a
-     * string), or a value to a file
-     * 
-     * @param action what to do (capture a value)
+     * Generic constructor. Note that decodeBase64 and outputFile are forced to
+     * false and null respectively unless action is VALUE_TO_FILE.
+     *
+     * @param action what to do
      * @param decodeBase64 true if value is Base64 encoded
-     * @param outputFile  file to put value in (if capturing to a file)
+     * @param outputFile file to put value in (if capturing to a file)
      */
     public HandleElement(int action, boolean decodeBase64, Path outputFile) {
         this.action = action;
-        this.decodeBase64 = decodeBase64;
-        this.outputFile = outputFile;      
+        if (action == VALUE_TO_FILE) {
+            this.decodeBase64 = decodeBase64;
+            this.outputFile = outputFile;
+        } else {
+            this.decodeBase64 = false;
+            this.outputFile = null;
+        }
     }
 
     /**
