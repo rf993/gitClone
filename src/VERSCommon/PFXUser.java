@@ -30,6 +30,7 @@ public final class PFXUser {
     java.security.cert.Certificate[] certificateChain;
     PublicKey pubKey;
     PrivateKey priKey;
+    String pfxFile;
 
     String userId;
     String userDesc;
@@ -64,6 +65,7 @@ public final class PFXUser {
         }
 
         // open pfx (pkcs12) file
+        this.pfxFile = pfxfile;
         fis = null;
         try {
             fis = new FileInputStream(pfxfile);
@@ -160,7 +162,15 @@ public final class PFXUser {
         }
         return sb.toString();
     }
-
+    
+    /**
+     * Return the pfx file that was read
+     * @return the file name that was originally passed in
+     */
+    public String getFileName() {
+        return pfxFile;
+    }
+    
     /**
      * Return the certificate.
      *
