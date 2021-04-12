@@ -487,7 +487,6 @@ public class ResultSummary {
                     }
                 }
                 if (j == ids[i].size()) {
-                    System.out.println("Adding new: "+id+" "+subId);
                     ids[i].add(new IdRef(id, subId));
                 }
             }
