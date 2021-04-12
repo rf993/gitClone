@@ -120,6 +120,7 @@ public class ResultSummary {
         w.write("WARNINGS THAT OCCURRED:\r\n");
         dummyRoot.report(Type.WARNING, w);
         w.write("\r\n");
+        w.flush();
     }
 
     /**
