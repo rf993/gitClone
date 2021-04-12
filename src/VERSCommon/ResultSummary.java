@@ -473,6 +473,7 @@ public class ResultSummary {
             int i, j;
             IdRef ir;
 
+            System.out.println("Adding: "+id+" "+subId);
             i = type.ordinal();
             if (ids[i] == null) {
                 ids[i] = new ArrayList<>();
@@ -485,7 +486,8 @@ public class ResultSummary {
                         break;
                     }
                 }
-                if (i == ids[i].size()) {
+                if (j == ids[i].size()) {
+                    System.out.println("Adding new: "+id+" "+subId);
                     ids[i].add(new IdRef(id, subId));
                 }
             }
@@ -611,6 +613,7 @@ public class ResultSummary {
         StringWriter sw;
 
         try {
+            /*
             // case 1-1, two completely different messages of length 1
             System.out.println("Two completely different messages length 1: a, b");
             rs = new ResultSummary();
@@ -670,7 +673,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
-
+*/
             // case 3-1, three identical messages
             System.out.println("Three completely identical messages: 'abc'x3");
             rs = new ResultSummary();
@@ -681,7 +684,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
-
+/*
             // case 3-2, three different tails
             System.out.println("Three different mesgs: 'abcd', 'abce', 'abcf'");
             rs = new ResultSummary();
@@ -704,6 +707,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
+*/
         } catch (IOException e) {
             System.out.println("Fatal error: " + e.getMessage());
         }
