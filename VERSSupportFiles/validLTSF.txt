@@ -13,10 +13,10 @@
 .ods	application/vnd.oasis.opendocument.spreadsheet
 .csv	text/csv
 .tsv
-.pptx;	.ppt application/vnd.openxmlformats-officedocument.presentationml.presentation; application/vnd.ms-powerpoint
+.pptx; .ppt	application/vnd.openxmlformats-officedocument.presentationml.presentation; application/vnd.ms-powerpoint
 .odp	application/vnd.oasis.opendocument.presentation
 .tif; .tiff	image/tif; application/tif; application/tiff
-.jpg;	.jpeg image/jpeg; image/jpg; application/jpg
+.jpg; .jpeg	image/jpeg; image/jpg; application/jpg
 .jp2	image/jp2; image/jpeg2000
 .png	image/png
 .dng
