@@ -473,7 +473,6 @@ public class ResultSummary {
             int i, j;
             IdRef ir;
 
-            System.out.println("Adding: "+id+" "+subId);
             i = type.ordinal();
             if (ids[i] == null) {
                 ids[i] = new ArrayList<>();
