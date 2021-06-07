@@ -512,7 +512,7 @@ public class XMLParser extends DefaultHandler2 {
      * @param in the String to encode
      * @return the encoded string
      */
-    public String xmlEncode(String in) {
+    public static String xmlEncode(String in) {
         StringBuffer out;
         int i;
         char c;
