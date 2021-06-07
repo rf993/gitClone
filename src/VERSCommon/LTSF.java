@@ -81,7 +81,7 @@ public class LTSF {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new VEOFatal(classname, method, 2, "Failed to open LTSF file '" + formats.toAbsolutePath().toString() + "'" + e.getMessage());
+            throw new VEOFatal(classname, method, 2, "Failed to open LTSF file '" + formats.toAbsolutePath().toString() + "' due to: " + e.getMessage());
         } catch (IOException ioe) {
             throw new VEOFatal(classname, method, 1, "Unexpected error: " + ioe.toString());
         } finally {
@@ -99,7 +99,20 @@ public class LTSF {
             }
         }
     }
-
+    
+    /**
+     * Free resouces associated with instance
+     */
+    public void free() {
+        if (ltsf != null) {
+            ltsf.clear();
+            ltsf = null;
+        }
+        if (ltsfMime != null) {
+            ltsfMime.clear();
+            ltsfMime = null;
+        }
+    }
     /**
      * Generate string representation...
      * @return
