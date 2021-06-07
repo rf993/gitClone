@@ -139,7 +139,28 @@ public final class PFXUser {
         }
         pubKey = (getX509Certificate().getPublicKey());
     }
-
+    
+    /**
+     * Free the resources associated with this instance
+     */
+    public void free() {
+        int i;
+        
+        ks = null;
+        password = null;
+        alias = null;
+        for (i=0; i<certificateChain.length; i++) {
+            certificateChain[i] = null;
+        }
+        certificateChain = null;
+        pubKey = null;
+        priKey = null;
+        pfxFile = null;
+        userId = null;
+        userDesc = null;
+        keyPhrase = null;
+    }
+    
     /**
      * Get String representation of user details.
      *
