@@ -29,7 +29,7 @@ public class XMLCreator {
     FileChannel xml;        // XML document being written
     String classname = "XMLCreator"; // String describing this class for error & logging
 
-    private final static Logger log = Logger.getLogger("versCommon.createXMLDoc");
+    private final static Logger LOG = Logger.getLogger("versCommon.createXMLDoc");
 
     /**
      * Creates an XML Document in the specified directory.
@@ -91,6 +91,7 @@ public class XMLCreator {
      * @param name the name of the element (must be non null & conform to
      * element name rules)
      * @param attributes any attributes to go in the element
+     * @param runOn if true, don't start a new line for the element
      * @throws AppError
      */
     public void startElement(String name, String attributes, boolean runOn) throws AppError {
@@ -238,7 +239,7 @@ public class XMLCreator {
      * single quote and double quote are quoted.
      *
      * @param s string to write to XML document
-     * @throws VEOError if a fatal error occurred
+     * @throws AppError if a fatal error occurred
      */
     public void writeClean(String s) throws AppError {
         String module = "write";
