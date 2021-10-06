@@ -422,7 +422,7 @@ public class ResultSummary {
         Type type;      // the type of the message (Error or Warning)
         String mesg;    // the complete message (including prefix)
         int index;      // the index of the first character *after* the common prefix
-        ArrayList<IdRef> ids[]; // references to the objects containing this message
+        ArrayList<ArrayList<IdRef>> ids; // references to the objects containing this message
 
         /**
          * Create a new message instance. The message instance has a type and an
@@ -440,13 +440,12 @@ public class ResultSummary {
             this.type = type;
             this.mesg = mesg;
             this.index = index;
-            ids = new ArrayList[Type.length];
+            ids = new ArrayList<>(Type.length);
             for (i = 0; i < Type.length; i++) {
-                ids[i] = null;
+                ids.add(i, new ArrayList<>());
             }
             i = type.ordinal();
-            ids[i] = new ArrayList<>();
-            ids[i].add(new IdRef(id, subId));
+            ids.get(i).add(new IdRef(id, subId));
         }
 
         /**
@@ -456,10 +455,11 @@ public class ResultSummary {
             int i;
 
             mesg = null;
-            for (i = 0; i < ids.length; i++) {
-                ids[i].clear();
-                ids[i] = null;
+            for (i = 0; i < ids.size(); i++) {
+                ids.get(i).clear();
+                ids.set(i, null);
             }
+            ids.clear();
             ids = null;
         }
 
@@ -474,20 +474,15 @@ public class ResultSummary {
             IdRef ir;
 
             i = type.ordinal();
-            if (ids[i] == null) {
-                ids[i] = new ArrayList<>();
-                ids[i].add(new IdRef(id, subId));
-            } else {
-                for (j = 0; j < ids[i].size(); j++) {
-                    ir = ids[i].get(j);
-                    if (ir.id.equals(id)) {
-                        ir.addSubId(subId);
-                        break;
-                    }
+            for (j = 0; j < ids.get(i).size(); j++) {
+                ir = ids.get(i).get(j);
+                if (ir.id.equals(id)) {
+                    ir.addSubId(subId);
+                    break;
                 }
-                if (j == ids[i].size()) {
-                    ids[i].add(new IdRef(id, subId));
-                }
+            }
+            if (j == ids.get(i).size()) {
+                ids.get(i).add(new IdRef(id, subId));
             }
         }
 
@@ -499,17 +494,19 @@ public class ResultSummary {
          * @throws IOException
          */
         public void report(Type type, Writer w) throws IOException {
+            ArrayList<IdRef> id;
             int i, j;
 
-            if (ids[type.ordinal()] != null) {
+            i = type.ordinal();
+            id = ids.get(i);
+            if (id.size() > 0) {
                 w.write("  ");
                 w.write(mesg);
                 w.write(" {\r\n");
-                j = type.ordinal();
-                for (i = 0; i < ids[j].size(); i++) {
+                for (j = 0; j < id.size(); j++) {
                     w.write("    ");
-                    w.write(ids[j].get(i).toString());
-                    if (i < ids[j].size() - 1) {
+                    w.write(id.get(j).toString());
+                    if (i < ids.size() - 1) {
                         w.write(",\r\n");
                     }
                 }
@@ -527,17 +524,17 @@ public class ResultSummary {
             sb.append("' index=");
             sb.append(index);
             for (i = 0; i < Type.length; i++) {
-                if (ids[i] != null) {
+                if (ids.get(i) != null) {
                     sb.append(" ");
                     sb.append(Type.toString(i));
                     sb.append(" count=");
-                    sb.append(ids[i].size());
+                    sb.append(ids.get(i).size());
                     sb.append(" {");
-                    for (j = 0; j < ids[i].size(); j++) {
+                    for (j = 0; j < ids.get(i).size(); j++) {
                         sb.append("'");
-                        sb.append(ids[i].get(j).toString());
+                        sb.append(ids.get(i).get(j).toString());
                         sb.append("'");
-                        if (j < ids[i].size() - 1) {
+                        if (j < ids.get(i).size() - 1) {
                             sb.append(", ");
                         }
                     }
@@ -671,7 +668,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
-*/
+             */
             // case 3-1, three identical messages
             System.out.println("Three completely identical messages: 'abc'x3");
             rs = new ResultSummary();
@@ -682,7 +679,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
-/*
+            /*
             // case 3-2, three different tails
             System.out.println("Three different mesgs: 'abcd', 'abce', 'abcf'");
             rs = new ResultSummary();
@@ -705,7 +702,7 @@ public class ResultSummary {
             rs.report(sw);
             System.out.println(sw.toString());
             rs.free();
-*/
+             */
         } catch (IOException e) {
             System.out.println("Fatal error: " + e.getMessage());
         }
