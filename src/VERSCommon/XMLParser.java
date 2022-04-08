@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
@@ -263,7 +264,7 @@ public class XMLParser extends DefaultHandler2 {
 
                     // if not decoding to Base64, open a writer on top of the file
                     if (!he.isDecodeBase64()) {
-                        encosw = new OutputStreamWriter(encbos);
+                        encosw = new OutputStreamWriter(encbos, Charset.forName("UTF-8"));
                     } else {
                         encosw = null;
                     }

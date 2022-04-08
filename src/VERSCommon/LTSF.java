@@ -6,9 +6,12 @@
 package VERSCommon;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -37,7 +40,8 @@ public class LTSF {
      */
     public LTSF(Path formats) throws VEOFatal {
         String method = "LTSF";
-        FileReader fr;
+        FileInputStream fis;
+        InputStreamReader isr;
         BufferedReader br;
         String s;
         String tokens1[], tokens2[];
@@ -47,11 +51,13 @@ public class LTSF {
         ltsfMime = new ArrayList<>();
 
         // open validLTPF.txt for reading
-        fr = null;
+        fis = null;
+        isr = null;
         br = null;
         try {
-            fr = new FileReader(formats.toFile());
-            br = new BufferedReader(fr);
+            fis = new FileInputStream(formats.toFile());
+            isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
+            br = new BufferedReader(isr);
 
             // go through validLTPF.txt line by line, copying patterns into hash map
             // ignore lines that do begin with a '!' - these are comment lines
@@ -91,9 +97,15 @@ public class LTSF {
                 } catch (IOException e) {
                     /* ignore */ }
             }
-            if (fr != null) {
+            if (isr != null) {
                 try {
-                    fr.close();
+                    isr.close();
+                } catch (IOException e) {
+                    /* ignore */ }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
                 } catch (IOException e) {
                     /* ignore */ }
             }
