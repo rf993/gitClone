@@ -1,5 +1,6 @@
 This zip file is a VERS Encapsulated Object (VEO). VEO files are
-specified in specifications associated with Public Record Office Victoria (PROV) Standard PROS 19/05 “Create, Capture and Control Standard”. As at
+specified in specifications associated with Public Record Office Victoria (PROV)
+Standard PROS 19/05 "Create, Capture and Control Standard". As at
 2020 this Standard was available from
 https://prov.vic.gov.au/recordkeeping-government/document-library/pros-1905-create-capture-and-control-standard
 
