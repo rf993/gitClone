@@ -132,7 +132,6 @@ public class XMLParser extends DefaultHandler2 {
     public void parse(Path xmlFile) throws AppError, AppFatal {
         FileInputStream fis;
         BufferedInputStream bis;
-        InputStreamReader fir;
         InputSource is;
 
         // check parameters
@@ -147,19 +146,8 @@ public class XMLParser extends DefaultHandler2 {
             throw new AppError("XML file '" + xmlFile.toString() + "' does not exist");
         }
         bis = new BufferedInputStream(fis);
-        // this is necessary because SAX cannot auto-detect the encoding of the XML files
-        // it will break if the encoding is not UTF-8
-        try {
-            fir = new InputStreamReader(bis, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            try {
-                fis.close();
-            } catch (IOException ioe) {
-                /* ignore */ }
-            throw new AppFatal("XMLParser.parse(): Error when setting encoding of input file: " + uee.getMessage());
-        }
-        is = new InputSource(fir);
-
+        is = new InputSource(bis);
+        
         // set up parse
         elementsFound = new Stack<>();
         recordElement = false;
@@ -177,10 +165,6 @@ public class XMLParser extends DefaultHandler2 {
             }
         } finally {
             elementsFound = null;
-            try {
-                fir.close();
-            } catch (IOException ioe) {
-                /* ignore */ }
             try {
                 bis.close();
             } catch (IOException ioe) {
