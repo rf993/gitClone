@@ -1,5 +1,9 @@
 # VERSCommon
 
+Copyright Public Records Office Victoria 2022
+
+License CC BY 4.0
+
 This package is part of the Victorian Electronic Records Strategy (VERS)
 software release. For more information about VERS see
 [here](https://prov.vic.gov.au/recordkeeping-government/vers).
