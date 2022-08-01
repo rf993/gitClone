@@ -16,7 +16,7 @@ contained in subdirectories of this directory. The metadata that
 organises and describes the information is contained in the
 VEOContent.xml file.
 
-The VEOContent.xml file contains one or more Information Objects – each
+The VEOContent.xml file contains one or more Information Objects - each
 of which is a logical collection of information. Information Objects
 may contain one or more Information Pieces. An Information Piece
 represents a piece of information contained in this VEO. An Information
@@ -26,7 +26,7 @@ present, this represents the same information expressed using different
 software formats.
 
 The XML elements in the VEOContent file are:
-*	VEOVersion. The version of this Standard. This should be ‘3.0’.
+*	VEOVersion. The version of this Standard. This should be '3.0'.
 *	HashFunctionAlgorithm. The hash function used to calculate the
 	hash values stored in HashValue (see below)
 *	InformationObject. A logical collection of information in this
@@ -58,7 +58,7 @@ The XML elements in the VEOContent file are:
 	hash function (see HashFunctionAlgorithm above) to the sequence
 	of octets forming the file.
 
-The VEOContentSignature?.xml (where ‘?’ is a number) files each contain
+The VEOContentSignature?.xml (where '?' is a number) files each contain
 a digital signature that allows detection of corruption of the
 VEOContent.xml file (and because the VEOContent.xml file includes hash
 values of the content files, corruption of the content files as well).
@@ -80,7 +80,7 @@ be self signed.
 
 The VEOHistory.xml file contains a summary of events in the life of
 this VEO. The elements in this file are:
-*	VEOVersion. The version of this Standard. This should be ‘3.0’.
+*	VEOVersion. The version of this Standard. This should be '3.0'.
 *	Event. A collection of information about an event in the life
 	of this VEO.
 *	EventDateTime. The date and time the event occurred. Expressed
@@ -91,7 +91,7 @@ this VEO. The elements in this file are:
 *	Description. A text description of the event.
 *	Errors. Any error resulting from this event.
 
-The VEOHistorySignaturen.xml (where ‘n’ is a number) files each contain
+The VEOHistorySignature?.xml (where '?' is a number) files each contain
 a digital signature that allows detection of corruption of the
 VEOHistory.xml file. The contents and method of generation of a
 VEOHistorySignature file is identical to a VEOContentSignature file.
