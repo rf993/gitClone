@@ -5,6 +5,7 @@
  */
 package VERSCommon;
 
+import TrackTransfer.CmdAnnotate;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -12,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
+import TrackTransfer.TrackTransfer;
+import java.util.logging.Level;
 
 /**
  * This class captures and prepares a summary of messages. Essentially, it
@@ -34,6 +37,7 @@ public class ResultSummary {
 
     LetterMatch dummyRoot;      // stored results
     String currentId;           // current identifier to be used to label new results
+    String database;            // database where results are to be stored
 
     /**
      * Creates a ResultSummary
@@ -41,6 +45,7 @@ public class ResultSummary {
     public ResultSummary() {
         dummyRoot = new LetterMatch();
         currentId = "unknown";
+        database = null;
     }
 
     /**
@@ -48,6 +53,21 @@ public class ResultSummary {
      */
     public void free() {
         dummyRoot.free();
+    }
+
+    /**
+     * Specify the database name to connect to
+     *
+     * @param database database name
+     * @throws VERSCommon.AppError if database name was invalid
+     */
+    public void setDatabase(String database) throws AppError {
+
+        // sanity check
+        if (database == null || database.equals("") || database.trim().equals(" ")) {
+            throw new AppError("Invalid database name: '" + database + "'");
+        }
+        this.database = database;
     }
 
     /**
@@ -59,19 +79,6 @@ public class ResultSummary {
         currentId = id;
     }
 
-    /**
-     * Add a new message to the result structure. Uses the 'currentId' (set by a
-     * previous call to 'setId()') as the identifier for the source of this
-     * message. The message is assumed to be an ERROR.
-     *
-     * @param type The type of the message
-     * @param mesg Message to be recorded
-     */
-    /*
-    public void recordResult(Type type, String mesg) {
-        recordResult(type, mesg, currentId, null);
-    }
-     */
     /**
      * Add a new message to the result structure. The message has a type, and an
      * identifier that identifies the source of the message. The identifier is
@@ -96,6 +103,13 @@ public class ResultSummary {
         dummyRoot.addMesg(type, mesg, 0, id, subId);
     }
 
+    /**
+     * Write a text report to a Writer giving a summary of all the errors and
+     * warnings, and the VEOs they occurred in.
+     *
+     * @param w Writer to receive report
+     * @throws IOException Something went wrong
+     */
     public void report(Writer w) throws IOException {
         SimpleDateFormat sdf;
         TimeZone tz;
@@ -121,6 +135,17 @@ public class ResultSummary {
         dummyRoot.report(Type.WARNING, w);
         w.write("\r\n");
         w.flush();
+    }
+
+    /**
+     * Record errors and warnings in a database
+     */
+    public void record2DB() throws AppFatal, AppError {
+        if (database == null) {
+            return;
+        }
+        dummyRoot.record2DB(Type.ERROR, database);
+        dummyRoot.record2DB(Type.WARNING, database);
     }
 
     /**
@@ -388,6 +413,13 @@ public class ResultSummary {
             tailsOfMessage.add(new Mesg(type, mesg, indexCharToMatch + 1, id, subId));
         }
 
+        /**
+         * Generate a report of the appropriate type of messages to the writer
+         *
+         * @param type type of messages to express
+         * @param w writer
+         * @throws IOException
+         */
         public void report(Type type, Writer w) throws IOException {
             int j;
             LetterMatch lm;
@@ -407,6 +439,36 @@ public class ResultSummary {
             if (lm != null) {
                 do {
                     lm.report(type, w);
+                    lm = lm.next;
+                } while (lm != nextLetters);
+            }
+        }
+
+        /**
+         * Generate a report of the appropriate type of messages to the writer
+         *
+         * @param type type of messages to express
+         * @param database database to receive the messages
+         */
+        public void record2DB(Type type, String database) throws AppFatal, AppError {
+            int j;
+            LetterMatch lm;
+
+            // report on messages that completely match the prefix
+            if (matchedMesg != null) {
+                matchedMesg.record2DB(type, database);
+            }
+
+            // report on messages for which this was a prefix
+            for (j = 0; j < tailsOfMessage.size(); j++) {
+                tailsOfMessage.get(j).record2DB(type, database);
+            }
+
+            // recurse for longer prefixes
+            lm = nextLetters;
+            if (lm != null) {
+                do {
+                    lm.record2DB(type, database);
                     lm = lm.next;
                 } while (lm != nextLetters);
             }
@@ -511,6 +573,47 @@ public class ResultSummary {
                     }
                 }
                 w.write("}\r\n");
+            }
+        }
+
+        /**
+         * Put this message in a database
+         *
+         * @param type type of messages being reported on
+         * @param w the writer on which to write
+         */
+        public void record2DB(Type type, String database) throws AppFatal, AppError {
+            ArrayList<IdRef> id;
+            ArrayList<String> cmd = new ArrayList<>();
+            String[] s;
+            int i, j;
+
+            i = type.ordinal();
+            id = ids.get(i);
+            if (id.size() > 0) {
+                cmd.add("annotate");
+                cmd.add("-db");
+                cmd.add(database);
+                cmd.add("-desc");
+                cmd.add(mesg);
+                if (type == Type.ERROR) {
+                    cmd.add("-abandoned");
+                } else {
+                    cmd.add("-set");
+                    cmd.add("Warning");
+                }
+                cmd.add("-items");
+                for (j = 0; j < id.size(); j++) {
+                    cmd.add(id.get(j).toString());
+                }
+                TrackTransfer tt = new TrackTransfer(Level.INFO);
+                s = (String[]) cmd.toArray();
+                System.out.print("==>");
+                for (j=0; j<s.length; j++) {
+                    System.out.print(" '"+s[j]+"'");
+                }
+                System.out.println("");
+                tt.doCommand(s);
             }
         }
 
