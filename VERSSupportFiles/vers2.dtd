@@ -37,6 +37,9 @@
 <!-- Summary of changes from Version 2.0.3:                                 -->
 <!--  * Made vers:RenderingKeywords mandatory as cannot deal with VEOs      -->
 <!--    without it                                                          -->
+<!--                                                                        -->
+<!-- Summary of changes from Version 2.0.4 (2023-10-19):                    -->
+<!--  * Added vers:contextPath to vers:FileMetadata                         -->
 
 <!--  BASIC VEO STRUCTURE                                                   -->
 
@@ -261,12 +264,19 @@
 <!ATTLIST vers:AuthorizingOfficer scheme CDATA #IMPLIED>
 
 <!ELEMENT vers:FileMetadata (
-	naa:Agent+, naa:RightsManagement, naa:Title, vers:Subject*,
+	naa:Agent+, naa:RightsManagement, naa:Title, vers:contextPath*, vers:Subject*,
 	naa:Description*, vers:AuxiliaryDescription*, naa:Language*,
 	naa:Relation*, naa:Coverage*, naa:Function*, vers:Date, naa:Type?,
 	naa:AggregationLevel, naa:Format?, naa:RecordIdentifier?,
 	naa:ManagementHistory+, naa:UseHistory*, naa:PreservationHistory*,
 	naa:Location?, naa:Disposal, naa:Mandate*, vers:VEOIdentifier)>
+
+<!-- added in version 2.0.4 -->
+<!ELEMENT vers:contextPath (
+	vers:contextPathDomain,
+	vers:contextPathValue)>
+<!ELEMENT vers:contextPathDomain (#PCDATA)>
+<!ELEMENT vers:contextPathValue (#PCDATA)>
 
 <!ELEMENT vers:Date (
 	naa:DateTimeCreated, naa:DateTimeTransacted,
