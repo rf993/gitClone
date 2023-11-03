@@ -30,6 +30,7 @@
     <xs:sequence>
       <xs:element name="MetadataSchemaIdentifier" type="xs:string"/>
       <xs:element name="MetadataSyntaxIdentifier" type="xs:string"/>
+      <!-- note can't use as this is optional <xs:element name="UseFor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> -->
       <xs:any processContents="lax" minOccurs="1" maxOccurs="unbounded"/> <!-- any RDF -->
     </xs:sequence>
   </xs:complexType>
