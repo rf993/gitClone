@@ -22,12 +22,11 @@ public class VEOError extends Exception {
      *
      * @param s the error message to return
      */
-    /*
     public VEOError(String s) {
         super(s);
         errno = -1;
     }
-     */
+
     /**
      * Construct a new VEOError from a class constructor giving error number.
      * This constructor should be used when it is desired to test that this
@@ -36,12 +35,12 @@ public class VEOError extends Exception {
      * @param errno unique error number
      * @param s error message
      */
-    /*
+
     public VEOError(int errno, String s) {
         super(s);
         this.errno = errno;
     }
-     */
+
     
     /**
      * Construct a new VEOError using a VEOFailure
