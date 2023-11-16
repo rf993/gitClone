@@ -264,7 +264,7 @@
 <!ATTLIST vers:AuthorizingOfficer scheme CDATA #IMPLIED>
 
 <!ELEMENT vers:FileMetadata (
-	naa:Agent+, naa:RightsManagement, naa:Title, vers:contextPath*, vers:Subject*,
+	naa:Agent+, naa:RightsManagement, naa:Title, vers:ContextPath*, vers:Subject*,
 	naa:Description*, vers:AuxiliaryDescription*, naa:Language*,
 	naa:Relation*, naa:Coverage*, naa:Function*, vers:Date, naa:Type?,
 	naa:AggregationLevel, naa:Format?, naa:RecordIdentifier?,
@@ -272,11 +272,11 @@
 	naa:Location?, naa:Disposal, naa:Mandate*, vers:VEOIdentifier)>
 
 <!-- added in version 2.0.4 -->
-<!ELEMENT vers:contextPath (
-	vers:contextPathDomain,
-	vers:contextPathValue)>
-<!ELEMENT vers:contextPathDomain (#PCDATA)>
-<!ELEMENT vers:contextPathValue (#PCDATA)>
+<!ELEMENT vers:ContextPath (
+	vers:ContextPathDomain,
+	vers:ContextPathValue)>
+<!ELEMENT vers:ContextPathDomain (#PCDATA)>
+<!ELEMENT vers:ContextPathValue (#PCDATA)>
 
 <!ELEMENT vers:Date (
 	naa:DateTimeCreated, naa:DateTimeTransacted,
