@@ -606,7 +606,7 @@ public class ResultSummary {
                 for (j = 0; j < id.size(); j++) {
                     cmd.add(id.get(j).toString());
                 }
-                TrackTransfer tt = new TrackTransfer(Level.INFO);
+                TrackTransfer tt = new TrackTransfer(null);
                 s = (String[]) cmd.toArray();
                 System.out.print("==>");
                 for (j=0; j<s.length; j++) {
