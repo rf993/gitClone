@@ -13,10 +13,12 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 /**
- * This class reports the results of a V2 or V3 Analysis as a CSV file
+ * This class reports the results of a V2 or V3 Analysis as a CSV file.
+ * 
+ * 20231120 1.00 Created from class in neoVEO/V3Analysis
+ * 20231214 1.01 Added proper quoting of values as per RFC4180
  *
  * @author Andrew
  */
@@ -25,7 +27,17 @@ public class AnalysisReportCSV {
     OutputStreamWriter osw;
     BufferedWriter csvReportW;
 
+    /**
+     * Constructor.
+     * 
+     * @param outputDir directory where to create the CSV file (cannot be null)
+     * @param runDateTime the current data/time (cannot be null)
+     * @throws IOException 
+     */
     public AnalysisReportCSV(Path outputDir, String runDateTime) throws IOException {
+        assert outputDir != null;
+        assert runDateTime != null;
+        
         Path p = outputDir.resolve("Results-" + runDateTime.replaceAll(":", "-") + ".csv");
         try {
             fos = new FileOutputStream(p.toFile());
@@ -38,13 +50,18 @@ public class AnalysisReportCSV {
 
     /**
      * Output a collection of errors and warnings to the CSV file
-     * @param veo The veo being tested
-     * @param errors The errors generated
-     * @param warnings The warnings generated
+     *
+     * @param veo The veo being tested (cannot be null)
+     * @param errors The errors generated (cannot be null)
+     * @param warnings The warnings generated (cannot be null)
      * @throws java.io.IOException if something went wrong
      */
     public void write(Path veo, ArrayList<VEOFailure> errors, ArrayList<VEOFailure> warnings) throws IOException {
         int i;
+
+        assert veo != null;
+        assert errors != null;
+        assert warnings != null;
         
         if (csvReportW == null) {
             throw new IOException("Attempting to write to TSV report file before it was opened");
@@ -62,41 +79,84 @@ public class AnalysisReportCSV {
             }
             csvReportW.flush();
         } catch (IOException ioe) {
-            throw new IOException("Failed writing to TSV report. Cause: "+ioe.getMessage());
+            throw new IOException("Failed writing to TSV report. Cause: " + ioe.getMessage());
         }
     }
-    
 
     /**
-     * Write a line in the TSV Report
+     * Write a line in the CSV Report
      *
-     * @param veo the VEO being reported on
+     * @param veo the VEO being reported on (cannot be null)
      * @param error true if an error occurred, false if it is a warning
      * @param ve the error/warning that occurred
      * @throws IOException
      */
-    public void writeCSVReportLine(Path veo, VEOFailure ve, boolean error) throws IOException {
-        csvReportW.write(veo != null ? veo.getFileName().toString() : "");
-        csvReportW.write(',');
+    private void writeCSVReportLine(Path veo, VEOFailure ve, boolean error) throws IOException {
+        assert veo != null;
+        outputCSVValue(veo.getFileName().toString(), ",");
         if (ve != null) {
             if (error) {
-                csvReportW.write("Error,");
+                outputCSVValue("Error", ",");
             } else {
-                csvReportW.write("Warning,");
+                outputCSVValue("Warning", ",");
             }
-            csvReportW.write(ve.getFailureId());
-            csvReportW.write(',');
-            csvReportW.write(ve.getMessage());
+            outputCSVValue(ve.getFailureId(), ",");
+            outputCSVValue(ve.getMessage(), ",");
         } else {
-            csvReportW.write("OK,,");
+            outputCSVValue("OK", ",");
+            outputCSVValue("", ",");
+            outputCSVValue("", ",");
         }
-        csvReportW.write(',');
-        csvReportW.write(veo != null ? veo.toString() : "");
-        csvReportW.write("\n");
+        outputCSVValue(veo.toString(), "\n");
+    }
+
+    /**
+     * Output a CSV value, respecting the restrictions of RFC 4180. Specifically
+     * values that contains a comma, double quote, new line, or carriage
+     * return must be enclosed in double quotes. Any value enclosed in double
+     * quotes must have the comma and double quote characters quoted with a
+     * preceding double quote. Lines must end MS-DOS style with a '\r\n'.
+     * 
+     * @param s the string value
+     * @param delim the delimiter to write after the value (comma or new line)
+     */
+    private void outputCSVValue(String s, String delim) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int i;
+        char c;
+
+        if (s != null) {
+            if (s.contains(",") || s.contains("\"") || s.contains("\n") || s.contains("\r")) {
+                sb.append("\"");
+                for (i = 0; i < s.length(); i++) {
+                    c = s.charAt(i);
+                    switch (c) {
+                        case ',':
+                            sb.append("\",");
+                            break;
+                        case '\"':
+                            sb.append("\"\"");
+                            break;
+                        default:
+                            sb.append(c);
+                            break;
+                    }
+                }
+                sb.append("\"");
+                csvReportW.write(sb.toString());
+            } else {
+                csvReportW.write(s);
+            }
+        }
+        if (delim.equals("\n")) {
+            csvReportW.write("\r");
+        }
+        csvReportW.write(delim);
     }
 
     /**
      * Close the CSV file
+     *
      * @throws java.io.IOException
      */
     public void close() throws IOException {
@@ -111,7 +171,7 @@ public class AnalysisReportCSV {
                 fos.close();
             }
         } catch (IOException ioe) {
-            throw new IOException("Failed to close the TSV report: {0}"+ioe.getMessage());
+            throw new IOException("Failed to close the TSV report: {0}" + ioe.getMessage());
         }
     }
 
