@@ -34,6 +34,9 @@ package VERSCommon;
  * the standard messages. This can be used if collecting a VEOFailure is not
  * useful (e.g. for logging or for generating a VEOError, AppError, VEOFatal,
  * or AppFatal
+ * 
+ * 20231103 1.00 Created as part of restructuring error reporting
+ * 20231204 1.01 Added toString()
  */
 public class VEOFailure {
     String failureId;   // unique identifier for type of failure
@@ -337,5 +340,24 @@ public class VEOFailure {
      */
     public String getFailureId() {
         return failureId;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        if (location != null) {
+            sb.append(location);
+            sb.append(": ");
+        }
+        sb.append(message);
+        if (e != null) {
+            sb.append(". Cause is: ");
+            sb.append(e.getMessage());
+        }
+        sb.append(" (");
+        sb.append(failureId);
+        sb.append(")");
+        return sb.toString();
     }
 }
