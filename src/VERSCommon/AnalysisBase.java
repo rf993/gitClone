@@ -27,6 +27,9 @@ import java.util.logging.Logger;
  * VEO objects. It records whether the object is valid (and if not the error
  * messages), and whether there are warnings (things that are not errors, but
  * should not happen).
+ * 
+ * 20231120 1.00 Created from RepnBase in neoVEO/V3Analysis
+ * 20231130 1.01 Changed addError() & addWarning() to be final
  *
  * @author Andrew Waugh
  */
@@ -110,7 +113,7 @@ public abstract class AnalysisBase {
      *
      * @param v The error to add
      */
-    public void addError(VEOFailure v) {
+    public final void addError(VEOFailure v) {
         assert (infoAvailable);
         assert (v != null);
         errors.add(v);
@@ -145,7 +148,7 @@ public abstract class AnalysisBase {
      *
      * @param v The warning to add
      */
-    public void addWarning(VEOFailure v) {
+    public final void addWarning(VEOFailure v) {
         assert (infoAvailable);
         assert (v != null);
         warnings.add(v);
@@ -526,14 +529,4 @@ public abstract class AnalysisBase {
          }
          */
     }
-
-    /**
-     * Get a description of the status of this object and all child objects,
-     * including any errors or warnings. This is an abstract method that is
-     * overriden by subclasses.
-     *
-     * @return A String containing the status
-     */
-    @Override
-    abstract public String toString();
 }
