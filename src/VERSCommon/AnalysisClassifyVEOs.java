@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 /**
  * This class sorts VEOs into a subdirectory structure depending on the errors
  * and warnings produced when analysing them.
+ * 
+ * 20231120 1.00 Created from class in neoVEO/V3Analysis
  *
  * @author Andrew
  */
